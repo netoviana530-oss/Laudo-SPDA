@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Relatório de Inspeção de SPDA</title>
+<meta name="description" content="Relatório de inspeção de SPDA — ABNT NBR 5419">
+<meta name="theme-color" content="#232833">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Laudo SPDA">
+<meta name="format-detection" content="telephone=no">
+<style>
+:root{
+  --ink:#16191F; --graphite:#232833; --surface:#EDEFF2; --card:#FFFFFF;
+  --line:#D6DBE1; --line-2:#B9C0C9; --muted:#5A6472; --ink-2:#39414D;
+  --copper:#A85B32; --copper-2:#8C4A28; --copper-tint:#F4E7DD;
+  --steel:#1F5F7A; --steel-tint:#E1EDF3;
+  --ok:#2C7A4B; --ok-tint:#E3F1E8;
+  --warn:#B7791F; --warn-tint:#F7EEDB;
+  --bad:#B23A2E; --bad-tint:#F7E3E0;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--surface);-webkit-text-size-adjust:100%;line-height:1.45}
+h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.01em}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--steel);box-shadow:0 0 0 3px var(--steel-tint)}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 5px 2px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--graphite);color:#fff;
+  display:flex;align-items:center;gap:12px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
+.brandmark{display:flex;align-items:center;gap:10px;min-width:0}
+.spark{flex:0 0 auto;width:30px;height:30px;border-radius:7px;background:linear-gradient(160deg,var(--copper),var(--copper-2));
+  display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.spark svg{width:17px;height:17px;display:block}
+.brandmark .t{min-width:0}
+.brandmark .t b{display:block;font-size:14px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brandmark .t span{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#9aa4b2}
+.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:1px solid transparent;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;background:#333a47;color:#e8ebef;white-space:nowrap}
+.btn:hover{background:#3d4553}
+.btn:hover{background:#3d4553}
+.btn.primary{background:var(--copper);color:#fff}
+.btn.primary:hover{background:var(--copper-2)}
+.btn.ghost{background:transparent;border-color:#3d4553;color:#c8ccd3}
+
+/* ---------- tabs ---------- */
+.tabs{position:sticky;top:50px;z-index:20;background:var(--ink);display:flex;gap:2px;overflow-x:auto;
+  padding:0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;top:calc(50px + env(safe-area-inset-top))}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:none;background:transparent;color:#8b94a3;padding:12px 13px;font-size:13px;font-weight:600;
+  border-bottom:2.5px solid transparent;display:flex;align-items:center;gap:7px}
+.tab .n{font-family:var(--mono);font-size:11px;color:#5f6a7a}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--copper)}
+.tab[aria-selected="true"] .n{color:var(--copper)}
+.tab .badge{background:var(--bad);color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 6px;font-family:var(--mono)}
+
+/* ---------- verdict bar ---------- */
+.verdict{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.chip b{font-family:var(--mono);font-weight:700}
+.chip.status{border:none;color:#fff;padding:7px 14px}
+.chip.s-ok{background:var(--ok)} .chip.s-warn{background:var(--warn)} .chip.s-bad{background:var(--bad)}
+
+/* ---------- toast + modal ---------- */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:11px 16px;border-radius:10px;font-size:13.5px;font-weight:600;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.modal{position:fixed;inset:0;background:rgba(15,17,21,.55);z-index:70;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:14px;max-width:360px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal .box p{margin:0 0 16px;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.modal .box .row{display:flex;gap:10px;justify-content:flex-end}
+.modal .btn2{border-radius:8px;padding:9px 16px;font-size:13.5px;font-weight:650;border:1px solid var(--line);cursor:pointer}
+.modal .btn2.no{background:#fff;color:var(--muted)}
+.modal .btn2.yes{background:var(--copper);color:#fff;border-color:var(--copper)}
+
+/* ---------- layout ---------- */
+main{max-width:960px;margin:0 auto;padding:16px 14px 90px}
+.panel{display:none;animation:fade .18s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.phead{display:flex;align-items:baseline;gap:12px;margin:2px 2px 14px}
+.phead .k{font-family:var(--mono);font-size:12px;color:var(--copper);font-weight:700}
+.phead h2{font-size:20px}
+.phead p{margin:0;color:var(--muted);font-size:13px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:0 0 14px}
+.card>h3{font-size:14px;letter-spacing:.02em;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:9px;color:var(--ink)}
+.card>h3::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--copper);flex:0 0 auto;transform:rotate(45deg)}
+.card>h3.steel::before{background:var(--steel)}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+.grid.three{grid-template-columns:repeat(3,1fr)}
+.grid.four{grid-template-columns:repeat(4,1fr)}
+.span2{grid-column:1/-1}
+@media(max-width:640px){.grid,.grid.three,.grid.four{grid-template-columns:1fr}.span2{grid-column:auto}}
+
+.hint{font-size:12px;color:var(--muted);margin:6px 2px 0}
+
+/* measurement readout */
+.readout{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.readout input{border:none;border-radius:0;font-family:var(--mono);font-weight:600;text-align:right;letter-spacing:.02em}
+.readout input:focus{box-shadow:none}
+.readout .unit{flex:0 0 auto;display:grid;place-items:center;padding:0 12px;background:var(--ink);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:700;min-width:52px}
+.readout select.unit{appearance:none;-webkit-appearance:none;color:#fff;border:none;text-align:center;cursor:pointer}
+
+/* dynamic item rows */
+.item{border:1px solid var(--line);border-radius:var(--r);margin:0 0 12px;overflow:hidden;background:#fff}
+.item>.ihead{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F8FA;border-bottom:1px solid var(--line)}
+.item>.ihead .idx{font-family:var(--mono);font-weight:700;color:#fff;background:var(--ink);border-radius:6px;
+  min-width:26px;height:26px;display:grid;place-items:center;font-size:12px}
+.item>.ihead .ttl{font-weight:650;font-size:13.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item>.ibody{padding:12px}
+.iconbtn{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:7px;width:30px;height:30px;font-size:16px;
+  color:var(--muted);display:grid;place-items:center;line-height:1}
+.iconbtn:hover{color:var(--bad);border-color:var(--bad)}
+.addbtn{width:100%;border:1.5px dashed var(--line-2);background:#fff;border-radius:var(--r);padding:12px;
+  color:var(--steel);font-weight:650;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px}
+.addbtn:hover{border-color:var(--steel);background:var(--steel-tint)}
+
+/* result flags */
+.flag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;font-family:var(--mono)}
+.flag.ok{background:var(--ok-tint);color:var(--ok)}
+.flag.bad{background:var(--bad-tint);color:var(--bad)}
+.flag.na{background:#eef0f2;color:var(--muted)}
+select.eval{font-weight:600}
+select[data-nc="1"]{border-color:var(--bad);background:var(--bad-tint);color:var(--bad-2,#8f2c22);font-weight:600}
+
+/* photos */
+.ph{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc}
+.ph img{display:block;width:100%;height:150px;object-fit:cover}
+.ph .rm{position:absolute;top:6px;right:6px;background:rgba(20,22,26,.72);color:#fff;border:none;border-radius:6px;
+  width:28px;height:28px;font-size:16px;line-height:1}
+.ph .cap{padding:8px;border-top:1px solid var(--line)}
+.ph .cap input{border:none;padding:6px 4px;font-size:13px}
+.ph .cap input:focus{box-shadow:none}
+.photobox{border:1.5px dashed var(--line-2);border-radius:8px;padding:14px;text-align:center;background:#fff;color:var(--steel);
+  font-weight:600;font-size:13px;cursor:pointer}
+.photobox:hover{background:var(--steel-tint);border-color:var(--steel)}
+.photobox input{display:none}
+.thumbwrap{display:flex;gap:10px;align-items:center;margin-top:8px}
+.thumbwrap img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+
+.logopreview{display:flex;align-items:center;gap:12px}
+.logopreview img{max-height:56px;max-width:170px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:4px}
+
+.ref table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ref th,.ref td{border:1px solid var(--line);padding:7px 9px;text-align:center}
+.ref th{background:#F2F4F6;font-weight:650}
+.ref td:first-child{text-align:left;font-weight:600}
+
+.nc-empty{display:flex;align-items:center;gap:10px;color:var(--ok);font-weight:600;background:var(--ok-tint);
+  border:1px solid #bfe0cb;border-radius:8px;padding:14px}
+.nc-row{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-left:3px solid var(--bad);
+  border-radius:8px;padding:11px 12px;margin-bottom:8px;background:#fff}
+.nc-row .src{font-family:var(--mono);font-size:10.5px;color:#fff;background:var(--copper);border-radius:5px;padding:3px 7px;flex:0 0 auto;font-weight:700}
+.nc-row .txt{font-size:13.5px}
+.nc-row .txt b{display:block;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px}
+
+/* print header/cover (screen-hidden) */
+.print-only{display:none}
+
+/* ============ PRINT ============ */
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  :root{--surface:#fff}
+  .no-print,.topbar,.tabs,.verdict,.addbtn,.iconbtn,.photobox,.rm,.actions{display:none !important}
+  body{background:#fff;color:#000;font-size:11px}
+  main{max-width:none;margin:0;padding:0}
+  .panel{display:block !important;animation:none;page-break-before:always}
+  #tab-capa{page-break-before:auto}
+  .phead{border-bottom:1.5px solid #000;padding-bottom:6px;margin-bottom:10px}
+  .phead .k{color:#000}
+  .card{border:1px solid #999;box-shadow:none;break-inside:avoid;margin-bottom:10px;padding:11px}
+  .card>h3{border-color:#999}
+  .item,.nc-row,.ph{break-inside:avoid}
+  input,select,textarea{border:none !important;padding:2px 0 !important;background:transparent !important;
+    box-shadow:none !important;color:#000 !important;-webkit-appearance:none;appearance:none;resize:none;font-size:11px}
+  textarea{min-height:0;height:auto;overflow:visible}
+  label{color:#333;margin-bottom:1px}
+  .readout{border:none} .readout .unit{background:#000;color:#fff;padding:0 8px;min-width:0}
+  .readout input{text-align:left;padding-left:0 !important}
+  .item>.ihead{background:#f0f0f0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .item>.ihead .idx{background:#000 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ph img{height:auto;max-height:210px}
+  .flag,.chip,.nc-row .src,.spark{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .print-only{display:block}
+  .print-cover{page-break-after:always;padding-top:10mm}
+  .print-cover .pc-brand{display:flex;align-items:center;gap:14px;border-bottom:2px solid #000;padding-bottom:12px}
+  .print-cover .pc-brand img{max-height:64px;max-width:200px}
+  .print-cover h1{font-size:26px;margin:26mm 0 4px;line-height:1.15}
+  .print-cover .pc-sub{font-size:13px;color:#333;letter-spacing:.05em;text-transform:uppercase}
+  .print-cover .pc-grid{margin-top:16mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 10mm}
+  .print-cover .pc-grid .f b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#555}
+  .print-cover .pc-grid .f span{font-size:13px}
+  .print-cover .pc-verdict{margin-top:14mm;border:2px solid #000;padding:10px 14px;font-size:14px;font-weight:700;text-align:center}
+  .print-foot{position:fixed;bottom:4mm;left:0;right:0;font-size:8.5px;color:#666;text-align:center;border-top:.5px solid #ccc;padding-top:2px}
+  .pilltab{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar no-print">
+  <div class="brandmark">
+    <span class="spark" id="brandSpark"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#fff"/></svg></span>
+    <span class="t"><b id="brandName">Sua Empresa</b><span id="brandTag">Inspeção de SPDA</span></span>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" onclick="novoRelatorio()">Novo</button>
+    <button class="btn ghost" onclick="document.getElementById('fileIn').click()">Abrir</button>
+    <button class="btn" onclick="salvarJSON()">Salvar</button>
+    <button class="btn primary" onclick="imprimir()">Gerar PDF</button>
+    <input type="file" id="fileIn" accept="application/json" style="display:none" onchange="abrirJSON(this)">
+  </div>
+</header>
+
+<nav class="tabs no-print" id="tabs" role="tablist"></nav>
+
+<div class="verdict no-print" id="verdict"></div>
+
+<!-- print-only cover -->
+<div class="print-only print-cover" id="printCover"></div>
+
+<main id="main"></main>
+
+<div class="toast no-print" id="toast" role="status" aria-live="polite"></div>
+<div class="modal no-print" id="modal" role="dialog" aria-modal="true"><div class="box">
+  <p id="modalMsg"></p>
+  <div class="row"><button class="btn2 no" id="modalNo">Cancelar</button><button class="btn2 yes" id="modalYes">Confirmar</button></div>
+</div></div>
+
+<div class="print-only print-foot" id="printFoot"></div>
+
+<script>
+"use strict";
+
+/* ---------------- estado ---------------- */
+const TABS = [
+  {id:"capa",       n:"01", label:"Capa"},
+  {id:"instalacao", n:"02", label:"Instalação"},
+  {id:"captores",   n:"03", label:"Captores"},
+  {id:"descidas",   n:"04", label:"Descidas"},
+  {id:"aterramento",n:"05", label:"Aterramento"},
+  {id:"continuidade",n:"06",label:"Continuidade"},
+  {id:"instrumentos",n:"07",label:"Instrumentos"},
+  {id:"nc",         n:"08", label:"Não conformidades"},
+  {id:"fotos",      n:"09", label:"Fotos"},
+  {id:"parecer",    n:"10", label:"Parecer"},
+];
+
+function novo(){return {
+  empresa:{nome:"",logo:"",crea:"",resp:"",contato:"",endereco:""},
+  meta:{numero:"",revisao:"00",data:hoje(),inspetor:""},
+  cliente:{nome:"",cnpj:"",endereco:"",contato:""},
+  instalacao:{edificacao:"",uso:"",altura:"",area:"",nivel:"",metodo:"",estrutura:"",
+    tipoInspecao:"",dataUltima:"",periodicidade:"",dataProxima:"",clima:""},
+  captores:[], descidas:[],
+  aterramento:{tipo:"",hastes:"",caixas:"",conexoes:"",solda:"",obs:"",foto:"",
+    r_valor:"",r_unid:"Ω",r_metodo:"",r_instr:"",r_temp:"",r_umid:"",r_alvo:"10"},
+  config:{contUnid:"Ω",contLimite:"1"},
+  continuidade:[], instrumentos:[], fotos:[], ncManuais:[],
+  parecer:{situacao:"",texto:"",recomendacoes:"",responsavel:"",crea:"",art:"",dataEmissao:hoje()}
+};}
+let R = novo();
+
+function hoje(){const d=new Date();return d.toISOString().slice(0,10);}
+function getP(o,p){return p.split(".").reduce((a,k)=>a==null?a:a[k],o);}
+function setP(o,p,v){const ks=p.split(".");const last=ks.pop();let t=o;ks.forEach(k=>t=t[k]=t[k]??{});t[last]=v;}
+function esc(s){return (s??"").toString().replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmtData(iso){if(!iso)return "—";const [y,m,d]=iso.split("-");return d&&m&&y?`${d}/${m}/${y}`:iso;}
+
+/* opções + regras de NC */
+const OPT={
+  condicao:["Bom","Regular","Ruim"],
+  corrosao:["Ausente","Leve","Moderada","Severa"],
+  fixacao:["Adequada","Regular","Inadequada"],
+  conexao:["Adequada","Regular","Inadequada"],
+  simnao:["Sim","Não","N/A"],
+};
+const NC_RULE={
+  condicao:v=>v==="Ruim",
+  corrosao:v=>v==="Moderada"||v==="Severa",
+  fixacao:v=>v==="Inadequada",
+  conexao:v=>v==="Inadequada",
+};
+
+/* ---------------- render base ---------------- */
+function renderTabs(){
+  const el=document.getElementById("tabs");
+  el.innerHTML=TABS.map((t,i)=>`<button class="tab" role="tab" data-tab="${t.id}"
+     aria-selected="${i===0?'true':'false'}" onclick="go('${t.id}')">
+     <span class="n">${t.n}</span>${t.label}<span class="badge" id="badge-${t.id}" style="display:none"></span></button>`).join("");
+}
+let current="capa";
+function go(id){
+  current=id;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===id));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* helpers de campo */
+function fInput(path,label,ph="",type="text",cls=""){
+  return `<div class="${cls}"><label>${label}</label><input type="${type}" data-path="${path}" placeholder="${ph}"></div>`;
+}
+function fArea(path,label,ph="",cls="span2"){
+  return `<div class="${cls}"><label>${label}</label><textarea data-path="${path}" placeholder="${ph}"></textarea></div>`;
+}
+function fSel(path,label,opts,cls="",ph="Selecionar…"){
+  return `<div class="${cls}"><label>${label}</label><select data-path="${path}">
+    <option value="">${ph}</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`;
+}
+
+/* ---------------- painéis estáticos ---------------- */
+function buildPanels(){
+  const m=document.getElementById("main");
+  m.innerHTML=[
+    panelCapa(), panelInstalacao(), panelDin("captores"), panelDin("descidas"),
+    panelAterramento(), panelDin("continuidade"), panelDin("instrumentos"),
+    panelNC(), panelDin("fotos"), panelParecer()
+  ].join("");
+  document.querySelector("#tab-capa").classList.add("active");
+}
+
+function panelHead(k,title,sub){return `<div class="phead"><span class="k">${k}</span><div><h2>${title}</h2><p>${sub}</p></div></div>`;}
+
+function panelCapa(){return `<section class="panel" id="tab-capa">
+  ${panelHead("01","Capa & identidade","Identidade da empresa, dados do relatório e do cliente.")}
+  <div class="card"><h3>Identidade da empresa (white-label)</h3>
+    <div class="grid">
+      ${fInput("empresa.nome","Nome / razão social","Ex.: KVAR Automattic")}
+      ${fInput("empresa.crea","CREA / registro","Ex.: CREA-PA 17184 D")}
+      ${fInput("empresa.resp","Responsável técnico","Nome do eng. responsável")}
+      ${fInput("empresa.contato","Contato","Telefone / e-mail")}
+      ${fInput("empresa.endereco","Endereço","",'text','span2')}
+      <div class="span2"><label>Logo (aparece na capa do PDF)</label>
+        <div class="logopreview">
+          <label class="photobox" style="flex:1">Selecionar logo
+            <input type="file" accept="image/*" onchange="setLogo(this)"></label>
+          <img id="logoImg" alt="" style="display:none">
+          <button class="iconbtn" title="Remover" onclick="R.empresa.logo='';syncBrand();document.getElementById('logoImg').style.display='none'">✕</button>
+        </div></div>
+    </div>
+  </div>
+  <div class="card"><h3 class="steel">Dados do relatório</h3>
+    <div class="grid four">
+      ${fInput("meta.numero","Número","Ex.: SPDA-2026-014")}
+      ${fInput("meta.revisao","Revisão","00")}
+      ${fInput("meta.data","Data da inspeção","",'date')}
+      ${fInput("meta.inspetor","Inspetor em campo","")}
+    </div>
+  </div>
+  <div class="card"><h3 class="steel">Cliente / edificação</h3>
+    <div class="grid">
+      ${fInput("cliente.nome","Cliente","Razão social / nome")}
+      ${fInput("cliente.cnpj","CNPJ / CPF","")}
+      ${fInput("cliente.endereco","Endereço da instalação","",'text','span2')}
+      ${fInput("cliente.contato","Contato no local","")}
+    </div>
+  </div>
+</section>`;}
+
+function panelInstalacao(){return `<section class="panel" id="tab-instalacao">
+  ${panelHead("02","Dados da instalação","Classificação do SPDA conforme ABNT NBR 5419.")}
+  <div class="card"><h3>Edificação</h3>
+    <div class="grid">
+      ${fInput("instalacao.edificacao","Tipo de edificação","Ex.: galpão industrial")}
+      ${fInput("instalacao.uso","Uso / ocupação","Ex.: reciclagem")}
+      ${fInput("instalacao.altura","Altura (m)","",'number')}
+      ${fInput("instalacao.area","Área da cobertura (m²)","",'number')}
+    </div>
+  </div>
+  <div class="card"><h3>Sistema de proteção</h3>
+    <div class="grid">
+      ${fSel("instalacao.nivel","Nível de proteção (NP)",["I","II","III","IV"])}
+      ${fSel("instalacao.metodo","Método de captação",["Franklin (hastes)","Gaiola de Faraday (malha)","Condutores suspensos","Componentes naturais da estrutura","Misto"])}
+      ${fInput("instalacao.estrutura","Estrutura de descida","Ex.: cabo de cobre nu 50 mm²",'text','span2')}
+    </div>
+  </div>
+  <div class="card"><h3>Inspeção</h3>
+    <div class="grid">
+      ${fSel("instalacao.tipoInspecao","Tipo de inspeção",["Visual","Completa","Completa (sistema crítico)"])}
+      ${fInput("instalacao.clima","Condições no dia","Ex.: tempo seco, 32 °C")}
+      ${fInput("instalacao.dataUltima","Inspeção anterior","",'date')}
+      ${fInput("instalacao.dataProxima","Próxima inspeção","",'date')}
+      ${fInput("instalacao.periodicidade","Periodicidade adotada","Ex.: anual (visual) / bienal (completa)",'text','span2')}
+    </div>
+    <div class="ref" style="margin-top:4px">
+      <p class="hint" style="margin:0">Referência — ABNT NBR 5419-3:2026. A eficácia do aterramento passou a ser verificada por <b>continuidade elétrica</b> (7.1.4 / 7.3.4), não mais pela resistência. Nomenclatura: <b>Nível de Proteção (NP I a IV)</b>. A periodicidade das inspeções passou a depender do risco da estrutura — tipicamente <b>1 ou 3 anos</b> (7.3.2 f). Defina o intervalo pela análise de risco (NBR 5419-2).</p>
+    </div>
+  </div>
+</section>`;}
+
+function panelAterramento(){return `<section class="panel" id="tab-aterramento">
+  ${panelHead("05","Aterramento","Malha, conexões e medição de resistência de aterramento.")}
+  <div class="card"><h3>Sistema de aterramento</h3>
+    <div class="grid">
+      ${fInput("aterramento.tipo","Tipo","Ex.: anel + hastes")}
+      ${fInput("aterramento.hastes","Hastes (qtd. / tipo)","Ex.: 8 × cantoneira")}
+      ${fInput("aterramento.caixas","Caixas de inspeção","Ex.: 4, íntegras")}
+      ${fSel("aterramento.conexoes","Estado das conexões",OPT.conexao)}
+      ${fSel("aterramento.solda","Solda exotérmica / conectores",OPT.condicao)}
+      ${fArea("aterramento.obs","Observações","Corrosão, acessibilidade, sinalização…")}
+    </div>
+    <div style="margin-top:10px">${photoField("aterramento.foto")}</div>
+  </div>
+  <div class="card"><h3 class="steel">Resistência de aterramento</h3>
+    <div class="grid three">
+      <div><label>Valor medido</label>
+        <div class="readout"><input type="number" step="0.01" data-path="aterramento.r_valor" placeholder="0.00">
+          <select class="unit" data-path="aterramento.r_unid"><option>Ω</option><option>mΩ</option></select></div></div>
+      <div><label>Valor de referência</label>
+        <div class="readout"><input type="number" step="0.01" data-path="aterramento.r_alvo" placeholder="10">
+          <span class="unit">Ω</span></div></div>
+      <div><label>Resultado</label><div id="atResult" style="padding-top:6px"></div></div>
+      ${fInput("aterramento.r_metodo","Método","Ex.: queda de potencial")}
+      ${fInput("aterramento.r_instr","Instrumento","Terrômetro (modelo)")}
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+        ${fInput("aterramento.r_temp","Temp. (°C)","",'number')}
+        ${fInput("aterramento.r_umid","Umidade (%)","",'number')}
+      </div>
+    </div>
+    <p class="hint">Na NBR 5419-3:2026 a eficácia do aterramento é aferida pela <b>continuidade</b> (aba 06), não pela resistência. A medição de resistência passou a ser da fase de projeto (buscar o menor valor viável) e entra no laudo como informativa — o antigo critério de ≤ 10 Ω não aprova nem reprova mais o SPDA. Mantenha o alvo apenas se o cliente ainda o exigir.</p>
+  </div>
+</section>`;}
+
+function panelNC(){return `<section class="panel" id="tab-nc">
+  ${panelHead("08","Não conformidades","Agregadas automaticamente dos itens marcados + apontamentos manuais.")}
+  <div class="card"><h3>Apontamentos automáticos</h3><div id="ncAuto"></div></div>
+  <div class="card"><h3 class="steel">Apontamentos manuais</h3><div id="ncManuais"></div>
+    <button class="addbtn" onclick="addItem('ncManuais')">+ Adicionar não conformidade</button></div>
+</section>`;}
+
+function panelParecer(){return `<section class="panel" id="tab-parecer">
+  ${panelHead("10","Parecer técnico","Conclusão, recomendações e responsável técnico.")}
+  <div class="card"><h3>Conclusão</h3>
+    <div class="grid">
+      ${fSel("parecer.situacao","Situação do SPDA",["Conforme — apto","Apto com ressalvas","Não conforme — inapto"],'span2')}
+      ${fArea("parecer.texto","Parecer","Descrição geral do estado do sistema, base normativa (NBR 5419), etc.")}
+      ${fArea("parecer.recomendacoes","Recomendações","Ações corretivas e prazos sugeridos.")}
+    </div>
+  </div>
+  <div class="card"><h3 class="steel">Responsável técnico</h3>
+    <div class="grid">
+      ${fInput("parecer.responsavel","Nome","Eng. responsável")}
+      ${fInput("parecer.crea","CREA","")}
+      ${fInput("parecer.art","ART","Nº da ART")}
+      ${fInput("parecer.dataEmissao","Data de emissão","",'date')}
+    </div>
+  </div>
+</section>`;}
+
+/* painéis dinâmicos (listas) */
+function panelDin(kind){
+  const meta={
+    captores:{n:"03",t:"Captores",s:"Terminais aéreos / captação — inspeção item a item."},
+    descidas:{n:"04",t:"Condutores de descida",s:"Estado, seção e conexões dos condutores de descida."},
+    continuidade:{n:"06",t:"Continuidade",s:"Medição ponto a ponto com micro-ohmímetro (NBR 5419-3:2026, Anexo F)."},
+    instrumentos:{n:"07",t:"Instrumentos utilizados",s:"Equipamentos de medição e calibração."},
+    fotos:{n:"09",t:"Registro fotográfico",s:"Fotos gerais complementares com legenda."},
+  }[kind];
+  const addLabel={captores:"captor",descidas:"condutor de descida",continuidade:"medição",instrumentos:"instrumento",fotos:"foto"}[kind];
+  const settings = kind==="continuidade" ? `
+    <div class="card"><h3 class="steel">Critério de aceitação</h3>
+      <div class="grid three">
+        <div><label>Limite padrão</label>
+          <div class="readout"><input type="number" step="0.001" data-path="config.contLimite" placeholder="1">
+            <select class="unit" data-path="config.contUnid"><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></div>
+        <div class="span2"><p class="hint" style="margin:0">NBR 5419-3:2026 (Anexo F): continuidade aceitável quando trechos semelhantes ficam na mesma ordem de grandeza e <b>abaixo de 1&nbsp;Ω</b>. Ensaio a 4 fios, corrente &ge; 1&nbsp;A. Multímetro e alicate-terrômetro não são aceitos. Cada nova medição já entra com este limite.</p></div>
+      </div></div>` : "";
+  return `<section class="panel" id="tab-${kind}">
+    ${panelHead(meta.n,meta.t,meta.s)}
+    ${settings}
+    <div id="list-${kind}"></div>
+    <button class="addbtn" onclick="addItem('${kind}')">+ Adicionar ${addLabel}</button>
+  </section>`;
+}
+
+/* campo de foto reutilizável (aterramento) */
+function photoField(path){
+  const v=getP(R,path);
+  return `<div><label>Foto</label>
+    <label class="photobox">${v?"Trocar foto":"Selecionar foto"}
+      <input type="file" accept="image/*" onchange="setPhotoPath('${path}',this)"></label>
+    <div class="thumbwrap" ${v?"":'style="display:none"'} id="thumb-${path.replace(/\./g,'_')}">
+      ${v?`<img src="${v}"><button class="iconbtn" onclick="clearPhotoPath('${path}')">✕</button>`:""}</div></div>`;
+}
+
+/* ---------------- listas dinâmicas ---------------- */
+function itemDefaults(kind){return {
+  captores:{tipo:"",local:"",condicao:"",corrosao:"",fixacao:"",obs:"",foto:""},
+  descidas:{material:"",secao:"",local:"",condicao:"",conexoes:"",corrosao:"",obs:"",foto:""},
+  continuidade:{a:"",b:"",trecho:"",valor:"",unid:(R.config&&R.config.contUnid)||"Ω",limite:(R.config&&R.config.contLimite!=null)?R.config.contLimite:"1",instr:"",obs:""},
+  instrumentos:{nome:"",modelo:"",serie:"",calib:"",validade:""},
+  fotos:{legenda:"",img:""},
+  ncManuais:{descricao:"",local:"",severidade:"Média",acao:""},
+}[kind];}
+
+function addItem(kind){R[kind].push(itemDefaults(kind));renderList(kind);computeStatus();autosave();
+  if(kind!=="ncManuais"){const l=document.getElementById("list-"+kind);if(l)l.lastElementChild?.scrollIntoView({behavior:"smooth",block:"center"});}}
+function delItem(kind,i){R[kind].splice(i,1);renderList(kind);computeStatus();autosave();}
+
+function renderList(kind){
+  if(kind==="ncManuais")return renderNCManuais();
+  const el=document.getElementById("list-"+kind);if(!el)return;
+  const arr=R[kind];
+  if(!arr.length){el.innerHTML=`<div class="card" style="text-align:center;color:var(--muted)">Nenhum item. Toque em “Adicionar”.</div>`;return;}
+  el.innerHTML=arr.map((it,i)=>renderItem(kind,it,i)).join("");
+}
+
+function wrap(label,control){return `<div><label>${label}</label>${control}</div>`;}
+function ctlInput(kind,i,f,val,ph="",type="text",step=""){
+  return `<input type="${type}" ${step?`step="${step}"`:""} data-list="${kind}" data-i="${i}" data-f="${f}" value="${esc(val)}" placeholder="${ph}">`;
+}
+function ctlArea(kind,i,f,val,ph=""){return `<textarea data-list="${kind}" data-i="${i}" data-f="${f}" placeholder="${ph}">${esc(val)}</textarea>`;}
+function ctlSel(kind,i,f,opts,val){return `<select data-list="${kind}" data-i="${i}" data-f="${f}"><option value="">—</option>${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select>`;}
+
+function renderItem(kind,it,i){
+  const idx=String(i+1).padStart(2,"0");
+  const rm=`<button class="iconbtn" title="Remover" onclick="delItem('${kind}',${i})">✕</button>`;
+  const title=(it.a&&it.b)?`${it.a} → ${it.b}`:(it.tipo||it.material||it.nome||it.legenda||"Item "+idx);
+  let body="";
+  if(kind==="captores"){
+    body=`<div class="grid">
+      ${wrap("Identificação / local",ctlInput(kind,i,"local",it.local,"Ex.: cumeeira, eixo 3"))}
+      ${wrap("Tipo",ctlInput(kind,i,"tipo",it.tipo,"Ex.: haste Franklin"))}
+      ${wrap("Condição",ctlSel(kind,i,"condicao",OPT.condicao,it.condicao))}
+      ${wrap("Corrosão",ctlSel(kind,i,"corrosao",OPT.corrosao,it.corrosao))}
+      ${wrap("Fixação",ctlSel(kind,i,"fixacao",OPT.fixacao,it.fixacao))}
+      <div class="span2">${wrap("Observações",ctlArea(kind,i,"obs",it.obs,"Detalhes…"))}</div>
+      <div class="span2">${itemPhoto(kind,i,it.foto,"foto")}</div></div>`;
+  }else if(kind==="descidas"){
+    body=`<div class="grid">
+      ${wrap("Identificação / local",ctlInput(kind,i,"local",it.local,"Ex.: fachada oeste"))}
+      ${wrap("Material",ctlInput(kind,i,"material",it.material,"Ex.: cobre nu"))}
+      ${wrap("Seção (mm²)",ctlInput(kind,i,"secao",it.secao,"Ex.: 50"))}
+      ${wrap("Condição",ctlSel(kind,i,"condicao",OPT.condicao,it.condicao))}
+      ${wrap("Conexões",ctlSel(kind,i,"conexoes",OPT.conexao,it.conexoes))}
+      ${wrap("Corrosão",ctlSel(kind,i,"corrosao",OPT.corrosao,it.corrosao))}
+      <div class="span2">${wrap("Observações",ctlArea(kind,i,"obs",it.obs,"Detalhes…"))}</div>
+      <div class="span2">${itemPhoto(kind,i,it.foto,"foto")}</div></div>`;
+  }else if(kind==="continuidade"){
+    const readV=`<div class="readout"><input type="number" step="0.001" data-list="${kind}" data-i="${i}" data-f="valor" value="${esc(it.valor)}" placeholder="0.000">
+      <select class="unit" data-list="${kind}" data-i="${i}" data-f="unid">${["µΩ","mΩ","Ω"].map(u=>`<option ${u===it.unid?"selected":""}>${u}</option>`).join("")}</select></div>`;
+    const readL=`<div class="readout"><input type="number" step="0.001" data-list="${kind}" data-i="${i}" data-f="limite" value="${esc(it.limite)}" placeholder="—">
+      <span class="unit">${esc(it.unid||"mΩ")}</span></div>`;
+    body=`<div class="grid">
+      <div class="span2">${wrap("Trecho / subsistema",ctlSel(kind,i,"trecho",["Captação","Descida","Aterramento","Equipotencialização","Armadura estrutural (natural)","Outro"],it.trecho))}</div>
+      ${wrap("Ponto A",ctlInput(kind,i,"a",it.a,"Ex.: captor cumeeira"))}
+      ${wrap("Ponto B",ctlInput(kind,i,"b",it.b,"Ex.: barramento de terra"))}
+      ${wrap("Valor medido",readV)}
+      ${wrap("Limite (mesma unidade)",readL)}
+      ${wrap("Instrumento",ctlInput(kind,i,"instr",it.instr,"Micro-ohmímetro"))}
+      ${wrap("Resultado",`<div style="padding-top:6px">${contFlag(it)}</div>`)}
+      <div class="span2">${wrap("Observações",ctlArea(kind,i,"obs",it.obs,"Detalhes…"))}</div></div>`;
+  }else if(kind==="instrumentos"){
+    body=`<div class="grid">
+      ${wrap("Instrumento",ctlInput(kind,i,"nome",it.nome,"Ex.: micro-ohmímetro"))}
+      ${wrap("Modelo / fabricante",ctlInput(kind,i,"modelo",it.modelo))}
+      ${wrap("Nº de série",ctlInput(kind,i,"serie",it.serie))}
+      ${wrap("Certificado de calibração",ctlInput(kind,i,"calib",it.calib,"Nº"))}
+      ${wrap("Validade da calibração",ctlInput(kind,i,"validade",it.validade,"","date"))}</div>`;
+  }else if(kind==="fotos"){
+    body=`<div class="grid"><div class="span2">${itemPhoto(kind,i,it.img,"img")}</div>
+      <div class="span2">${wrap("Legenda",ctlInput(kind,i,"legenda",it.legenda,"Descrição da foto"))}</div></div>`;
+  }
+  return `<div class="item"><div class="ihead"><span class="idx">${idx}</span><span class="ttl">${esc(title)}</span>${rm}</div><div class="ibody">${body}</div></div>`;
+}
+
+/* fotos de item */
+function itemPhoto(kind,i,val,field){
+  const id=`ph-${kind}-${i}`;
+  return `<label>Foto</label>
+    <label class="photobox">${val?"Trocar foto":"Selecionar foto"}
+      <input type="file" accept="image/*" onchange="setItemPhoto('${kind}',${i},'${field}',this)"></label>
+    <div class="thumbwrap" id="${id}" ${val?"":'style="display:none"'}>
+      ${val?`<img src="${val}"><button class="iconbtn" onclick="clearItemPhoto('${kind}',${i},'${field}')">✕</button>`:""}</div>`;
+}
+
+/* NC manuais */
+function renderNCManuais(){
+  const el=document.getElementById("ncManuais");if(!el)return;
+  const arr=R.ncManuais;
+  if(!arr.length){el.innerHTML=`<p class="hint">Nenhum apontamento manual.</p>`;return;}
+  el.innerHTML=arr.map((it,i)=>`<div class="item"><div class="ihead"><span class="idx">${String(i+1).padStart(2,"0")}</span>
+    <span class="ttl">${esc(it.descricao||"Não conformidade")}</span>
+    <button class="iconbtn" onclick="delItem('ncManuais',${i})">✕</button></div>
+    <div class="ibody"><div class="grid">
+      ${wrap("Descrição",ctlInput("ncManuais",i,"descricao",it.descricao,"O que foi constatado"))}
+      ${wrap("Local",ctlInput("ncManuais",i,"local",it.local,"Onde"))}
+      ${wrap("Severidade",ctlSel("ncManuais",i,"severidade",["Baixa","Média","Alta"],it.severidade))}
+      <div class="span2">${wrap("Ação corretiva",ctlArea("ncManuais",i,"acao",it.acao,"Recomendação"))}</div>
+    </div></div></div>`).join("");
+}
+
+/* ---------------- avaliação / NC ---------------- */
+function num(v){const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:null;}
+function isNCcont(it){const v=num(it.valor),l=num(it.limite);return v!=null&&l!=null&&v>l;}
+function contFlag(it){
+  const v=num(it.valor),l=num(it.limite);
+  if(v==null)return `<span class="flag na">— sem medição</span>`;
+  if(l==null)return `<span class="flag na">medido</span>`;
+  return v>l?`<span class="flag bad">✕ não conforme</span>`:`<span class="flag ok">✓ conforme</span>`;
+}
+
+function collectNC(){
+  const out=[];
+  R.captores.forEach((it,i)=>{
+    const id=it.local||it.tipo||("Captor "+(i+1));
+    if(NC_RULE.condicao(it.condicao))out.push({src:"CAPTOR",label:id,det:"Condição: "+it.condicao});
+    if(NC_RULE.corrosao(it.corrosao))out.push({src:"CAPTOR",label:id,det:"Corrosão: "+it.corrosao});
+    if(NC_RULE.fixacao(it.fixacao))out.push({src:"CAPTOR",label:id,det:"Fixação: "+it.fixacao});
+  });
+  R.descidas.forEach((it,i)=>{
+    const id=it.local||it.material||("Descida "+(i+1));
+    if(NC_RULE.condicao(it.condicao))out.push({src:"DESCIDA",label:id,det:"Condição: "+it.condicao});
+    if(NC_RULE.conexao(it.conexoes))out.push({src:"DESCIDA",label:id,det:"Conexões: "+it.conexoes});
+    if(NC_RULE.corrosao(it.corrosao))out.push({src:"DESCIDA",label:id,det:"Corrosão: "+it.corrosao});
+  });
+  const a=R.aterramento;
+  if(NC_RULE.conexao(a.conexoes))out.push({src:"ATERR.",label:"Sistema de aterramento",det:"Conexões: "+a.conexoes});
+  if(NC_RULE.condicao(a.solda))out.push({src:"ATERR.",label:"Solda / conectores",det:"Estado: "+a.solda});
+  {const v=num(a.r_valor),l=num(a.r_alvo);if(v!=null&&l!=null&&v>l)out.push({src:"ATERR.",label:"Resistência de aterramento",det:`${a.r_valor} ${a.r_unid} > alvo ${a.r_alvo} Ω`});}
+  R.continuidade.forEach((it,i)=>{if(isNCcont(it))out.push({src:"CONTINUID.",label:`${it.a||"A"} → ${it.b||"B"}`,det:`${it.valor} ${it.unid} > limite ${it.limite} ${it.unid}`});});
+  R.ncManuais.forEach(it=>{if(it.descricao)out.push({src:"MANUAL",label:it.local||"—",det:it.descricao,sev:it.severidade,acao:it.acao});});
+  return out;
+}
+
+function computeStatus(){
+  const nc=collectNC();
+  // badges por aba
+  const counts={captores:0,descidas:0,aterramento:0,continuidade:0,nc:nc.length};
+  nc.forEach(x=>{if(x.src==="CAPTOR")counts.captores++;else if(x.src==="DESCIDA")counts.descidas++;
+    else if(x.src==="ATERR.")counts.aterramento++;else if(x.src==="CONTINUID.")counts.continuidade++;});
+  Object.entries(counts).forEach(([k,v])=>{const b=document.getElementById("badge-"+k);if(b){b.style.display=v?"inline-block":"none";b.textContent=v;}});
+
+  // verdict bar
+  const cap=R.captores.length,des=R.descidas.length,med=R.continuidade.length;
+  let scls="s-ok",stxt="Sem não conformidades";
+  if(nc.length){scls=nc.length>2?"s-bad":"s-warn";stxt=nc.length+(nc.length>1?" não conformidades":" não conformidade");}
+  document.getElementById("verdict").innerHTML=
+    `<span class="chip status ${scls}">${stxt}</span>
+     <span class="chip">Captores <b>${cap}</b></span>
+     <span class="chip">Descidas <b>${des}</b></span>
+     <span class="chip">Medições <b>${med}</b></span>
+     <span class="chip">NP <b>${R.instalacao.nivel||"—"}</b></span>`;
+
+  // resultado aterramento
+  const at=document.getElementById("atResult");
+  if(at){const v=num(R.aterramento.r_valor),l=num(R.aterramento.r_alvo);
+    at.innerHTML=v==null?`<span class="flag na">— sem medição</span>`:(l==null?`<span class="flag na">medido</span>`:(v>l?`<span class="flag bad">✕ acima do alvo</span>`:`<span class="flag ok">✓ conforme</span>`));}
+
+  // NC automáticas
+  const box=document.getElementById("ncAuto");
+  if(box){
+    const auto=nc.filter(x=>x.src!=="MANUAL");
+    box.innerHTML = auto.length? auto.map(x=>
+      `<div class="nc-row"><span class="src">${x.src}</span><div class="txt"><b>${esc(x.label)}</b>${esc(x.det)}</div></div>`).join("")
+      : `<div class="nc-empty">✓ Nenhuma não conformidade detectada automaticamente nos itens preenchidos.</div>`;
+  }
+  fillPrint(nc);
+}
+
+/* ---------------- fotos ---------------- */
+function resize(file,cb){
+  const rd=new FileReader();
+  rd.onload=e=>{const img=new Image();img.onload=()=>{
+    const max=1400;let w=img.width,h=img.height;
+    if(w>h&&w>max){h=Math.round(h*max/w);w=max;}else if(h>=w&&h>max){w=Math.round(w*max/h);h=max;}
+    const c=document.createElement("canvas");c.width=w;c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    try{cb(c.toDataURL("image/jpeg",0.72));}catch(_){cb(e.target.result);}
+  };img.onerror=()=>cb(e.target.result);img.src=e.target.result;};
+  rd.readAsDataURL(file);
+}
+function setItemPhoto(kind,i,field,input){const f=input.files[0];if(!f)return;resize(f,d=>{R[kind][i][field]=d;renderList(kind);autosave();});}
+function clearItemPhoto(kind,i,field){R[kind][i][field]="";renderList(kind);autosave();}
+function setPhotoPath(path,input){const f=input.files[0];if(!f)return;resize(f,d=>{setP(R,path,d);
+  const t=document.getElementById("thumb-"+path.replace(/\./g,"_"));if(t){t.style.display="flex";t.innerHTML=`<img src="${d}"><button class="iconbtn" onclick="clearPhotoPath('${path}')">✕</button>`;}autosave();});}
+function clearPhotoPath(path){setP(R,path,"");const t=document.getElementById("thumb-"+path.replace(/\./g,"_"));if(t){t.style.display="none";t.innerHTML="";}autosave();}
+function setLogo(input){const f=input.files[0];if(!f)return;resize(f,d=>{R.empresa.logo=d;syncBrand();autosave();});}
+
+/* ---------------- brand ---------------- */
+function syncBrand(){
+  document.getElementById("brandName").textContent=R.empresa.nome||"Sua Empresa";
+  const img=document.getElementById("logoImg");
+  if(R.empresa.logo){img.src=R.empresa.logo;img.style.display="block";}else{img.style.display="none";}
+}
+
+/* ---------------- data binding (escalares) ---------------- */
+function bindScalars(){
+  document.addEventListener("input",e=>{
+    const t=e.target;
+    if(t.dataset.path){setP(R,t.dataset.path,t.value);onScalar(t.dataset.path);}
+    else if(t.dataset.list){R[t.dataset.list][+t.dataset.i][t.dataset.f]=t.value;onListEdit(t.dataset.list,+t.dataset.i,t.dataset.f);}
+  });
+  document.addEventListener("change",e=>{ // selects em alguns browsers
+    const t=e.target;
+    if(t.tagName==="SELECT"){
+      if(t.dataset.path){setP(R,t.dataset.path,t.value);onScalar(t.dataset.path);}
+      else if(t.dataset.list){R[t.dataset.list][+t.dataset.i][t.dataset.f]=t.value;onListEdit(t.dataset.list,+t.dataset.i,t.dataset.f);}
+    }
+  });
+}
+let saveT=null;
+function onScalar(path){
+  if(path.startsWith("empresa.nome")||path.startsWith("empresa.logo"))syncBrand();
+  computeStatus();autosaveDeb();
+}
+function onListEdit(kind,i,f){
+  // re-render leve só quando muda unidade (limite espelha) — senão evita perder foco
+  if(kind==="continuidade"&&f==="unid")renderList(kind);
+  computeStatus();autosaveDeb();
+}
+function autosaveDeb(){clearTimeout(saveT);saveT=setTimeout(autosave,400);}
+
+/* ---------------- persistência ---------------- */
+function autosave(){try{localStorage.setItem("spda_draft",JSON.stringify(R));}catch(_){}}
+function loadDraft(){try{const s=localStorage.getItem("spda_draft");if(s)return JSON.parse(s);}catch(_){}return null;}
+
+function hydrate(){
+  document.querySelectorAll("[data-path]").forEach(el=>{const v=getP(R,el.dataset.path);el.value=(v==null?"":v);});
+  ["captores","descidas","continuidade","instrumentos","fotos"].forEach(renderList);
+  renderNCManuais();
+  // foto do aterramento
+  const p="aterramento.foto",v=R.aterramento.foto,t=document.getElementById("thumb-"+p.replace(/\./g,"_"));
+  if(t){if(v){t.style.display="flex";t.innerHTML=`<img src="${v}"><button class="iconbtn" onclick="clearPhotoPath('${p}')">✕</button>`;}else{t.style.display="none";t.innerHTML="";}}
+  syncBrand();computeStatus();
+}
+
+/* feedback em tela (funciona em qualquer navegador, inclusive no preview) */
+function toast(m){const t=document.getElementById("toast");if(!t)return;t.textContent=m;t.classList.add("show");
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2800);}
+let _yes=null;
+function confirmBox(m,onYes){const mo=document.getElementById("modal");document.getElementById("modalMsg").textContent=m;_yes=onYes;mo.classList.add("show");}
+function _closeModal(){document.getElementById("modal").classList.remove("show");_yes=null;}
+
+function imprimir(){try{window.print();}catch(_){toast("Impressão bloqueada aqui. Baixe o app e gere o PDF no Safari.");}}
+
+function salvarJSON(){
+  try{
+    const nome=(R.meta.numero||"relatorio-spda").replace(/[^\w\-]+/g,"_");
+    const blob=new Blob([JSON.stringify(R,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=nome+".json";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    toast("Salvo: "+nome+".json");
+  }catch(_){toast("Download bloqueado no preview. Baixe o app e use no Safari.");}
+}
+function abrirJSON(input){const f=input.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=e=>{try{const d=JSON.parse(e.target.result);R=Object.assign(novo(),d);hydrate();autosave();go("capa");toast("Relatório carregado");}
+    catch(_){toast("Arquivo inválido. Use um .json gerado por este app.");}input.value="";};rd.readAsText(f);}
+function novoRelatorio(){confirmBox("Iniciar um novo relatório? Os dados atuais serão limpos (salve antes, se precisar).",
+  ()=>{R=novo();hydrate();go("capa");autosave();toast("Novo relatório iniciado");});}
+
+/* ---------------- capa/rodapé de impressão ---------------- */
+function fillPrint(nc){
+  nc=nc||collectNC();
+  const e=R.empresa,c=R.cliente,m=R.meta,ins=R.instalacao,p=R.parecer;
+  const sit=p.situacao||(nc.length?"Não conforme — verificar apontamentos":"Conforme");
+  const logo=e.logo?`<img src="${e.logo}" alt="">`:`<span class="spark" style="width:44px;height:44px"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#000"/></svg></span>`;
+  document.getElementById("printCover").innerHTML=`
+    <div class="pc-brand">${logo}<div><div style="font-size:18px;font-weight:700">${esc(e.nome||"—")}</div>
+      <div style="font-size:11px;color:#555">${esc(e.crea||"")}${e.contato?" · "+esc(e.contato):""}</div></div></div>
+    <h1>Relatório de Inspeção de SPDA</h1>
+    <div class="pc-sub">Sistema de Proteção contra Descargas Atmosféricas · ABNT NBR 5419</div>
+    <div class="pc-grid">
+      <div class="f"><b>Cliente</b><span>${esc(c.nome||"—")}</span></div>
+      <div class="f"><b>Documento</b><span>${esc(m.numero||"—")} · rev. ${esc(m.revisao||"00")}</span></div>
+      <div class="f"><b>Instalação</b><span>${esc(c.endereco||"—")}</span></div>
+      <div class="f"><b>Data da inspeção</b><span>${fmtData(m.data)}</span></div>
+      <div class="f"><b>Nível de proteção</b><span>${esc(ins.nivel||"—")}</span></div>
+      <div class="f"><b>Tipo de inspeção</b><span>${esc(ins.tipoInspecao||"—")}</span></div>
+      <div class="f"><b>Responsável técnico</b><span>${esc(p.responsavel||e.resp||"—")}</span></div>
+      <div class="f"><b>CREA / ART</b><span>${esc(p.crea||e.crea||"—")}${p.art?" · ART "+esc(p.art):""}</span></div>
+    </div>
+    <div class="pc-verdict">${esc(sit)}${nc.length?`  ·  ${nc.length} não conformidade(s)`:""}</div>`;
+  document.getElementById("printFoot").innerHTML=
+    `${esc(e.nome||"")} · ${esc(m.numero||"")} · Emitido em ${fmtData(p.dataEmissao)} · Relatório de inspeção de SPDA conforme ABNT NBR 5419`;
+}
+
+/* ---------------- init ---------------- */
+window.onbeforeprint=()=>fillPrint();
+document.addEventListener("DOMContentLoaded",()=>{
+  renderTabs();buildPanels();bindScalars();
+  document.getElementById("modalYes").onclick=()=>{const f=_yes;_closeModal();if(f)f();};
+  document.getElementById("modalNo").onclick=_closeModal;
+  document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")_closeModal();});
+  const d=loadDraft();if(d)R=Object.assign(novo(),d);
+  hydrate();
+});
+</script>
+</body>
+</html>
